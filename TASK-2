@@ -1,0 +1,108 @@
+-- Step 1: Create the Database
+CREATE DATABASE EmployeeManagement;
+
+-- Step 2: Use the Database
+USE EmployeeManagement;
+
+-- Step 3: Create the Departments Table
+CREATE TABLE Departments (
+    DepartmentID INT PRIMARY KEY AUTO_INCREMENT,
+    DepartmentName VARCHAR(100) UNIQUE NOT NULL,
+    Location VARCHAR(100)
+);
+
+-- Step 4: Create the Job Positions Table
+CREATE TABLE JobPositions (
+    JobPositionID INT PRIMARY KEY AUTO_INCREMENT,
+    JobTitle VARCHAR(100) UNIQUE NOT NULL,
+    MinSalary DECIMAL(10, 2),
+    MaxSalary DECIMAL(10, 2)
+);
+
+-- Step 5: Create the Employees Table
+CREATE TABLE Employees (
+    EmployeeID INT PRIMARY KEY AUTO_INCREMENT,
+    FirstName VARCHAR(50) NOT NULL,
+    LastName VARCHAR(50) NOT NULL,
+    Email VARCHAR(100) UNIQUE NOT NULL,
+    Phone VARCHAR(15),
+    HireDate DATE NOT NULL,
+    JobPositionID INT NOT NULL,
+    DepartmentID INT NOT NULL,
+    Salary DECIMAL(10, 2) NOT NULL,
+    FOREIGN KEY (JobPositionID) REFERENCES JobPositions(JobPositionID),
+    FOREIGN KEY (DepartmentID) REFERENCES Departments(DepartmentID)
+);
+
+-- Step 6: Insert Data into Departments
+INSERT INTO Departments (DepartmentName, Location) VALUES
+('Human Resources', 'New York'),
+('Engineering', 'San Francisco'),
+('Marketing', 'Chicago');
+
+-- Step 7: Insert Data into Job Positions
+INSERT INTO JobPositions (JobTitle, MinSalary, MaxSalary) VALUES
+('Software Engineer', 60000, 120000),
+('HR Manager', 50000, 100000),
+('Marketing Specialist', 45000, 90000);
+
+-- Step 8: Insert Data into Employees
+INSERT INTO Employees (FirstName, LastName, Email, Phone, HireDate, JobPositionID, DepartmentID, Salary) VALUES
+('John', 'Doe', 'john.doe@example.com', '123-456-7890', '2022-01-15', 1, 2, 75000),
+('Jane', 'Smith', 'jane.smith@example.com', '987-654-3210', '2021-05-20', 2, 1, 60000),
+('Emily', 'Johnson', 'emily.johnson@example.com', '456-789-1230', '2023-03-01', 3, 3, 50000);
+
+-- Step 9: Retrieve All Employees with Department and Job Title
+SELECT 
+    e.EmployeeID, 
+    e.FirstName, 
+    e.LastName, 
+    d.DepartmentName, 
+    jp.JobTitle, 
+    e.Salary
+FROM 
+    Employees e
+JOIN 
+    Departments d ON e.DepartmentID = d.DepartmentID
+JOIN 
+    JobPositions jp ON e.JobPositionID = jp.JobPositionID;
+
+-- Step 10: Get the Average Salary by Department
+SELECT 
+    d.DepartmentName, 
+    AVG(e.Salary) AS AverageSalary
+FROM 
+    Employees e
+JOIN 
+    Departments d ON e.DepartmentID = d.DepartmentID
+GROUP BY 
+    d.DepartmentName;
+
+-- Step 11: List Employees Earning Above a Specified Salary
+SELECT 
+    FirstName, 
+    LastName, 
+    Salary
+FROM 
+    Employees
+WHERE 
+    Salary > 70000;
+
+-- Step 12: Find Departments with No Employees
+SELECT 
+    d.DepartmentName
+FROM 
+    Departments d
+LEFT JOIN 
+    Employees e ON d.DepartmentID = e.DepartmentID
+WHERE 
+    e.EmployeeID IS NULL;
+
+-- Step 13: Update an Employee's Salary Based on Performance
+UPDATE Employees
+SET Salary = Salary * 1.10
+WHERE EmployeeID = 1; -- Example for a specific employee
+
+-- Step 14: Delete Employees Who Left the Company Before a Certain Date
+DELETE FROM Employees
+WHERE HireDate < '2022-01-01';
